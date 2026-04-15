@@ -1,0 +1,13 @@
+<%- include('partials/top', { title, active: null }) %>
+  <div class="card">
+    <h1 class="h1">Error</h1>
+    <p class="muted">Terjadi kesalahan di server.</p>
+    <% if (message) { %>
+      <pre class="pre"><%= message %></pre>
+    <% } %>
+    <div class="actions">
+      <a class="btn" href="/transactions">Kembali</a>
+    </div>
+  </div>
+<%- include('partials/bottom') %>
+

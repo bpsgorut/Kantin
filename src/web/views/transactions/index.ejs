@@ -1,0 +1,99 @@
+<%- include('../partials/top', { title, active: 'transactions' }) %>
+  <div class="pagehead">
+    <div>
+      <h1 class="h1">Transaksi</h1>
+      <div class="muted">Pencatatan pembelian, status bayar, dan metode pembayaran</div>
+    </div>
+    <div class="pagehead__actions">
+      <a class="btn btn--primary" href="/transactions/new">Tambah Transaksi</a>
+    </div>
+  </div>
+
+  <%- include('../partials/flash', { msg, msgType }) %>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card__title">Ringkasan</div>
+      <div class="summary">
+        <div>
+          <div class="muted">Sudah dibayar</div>
+          <div class="summary__value"><%= formatRupiah(summary.paid_total) %></div>
+        </div>
+        <div>
+          <div class="muted">Belum dibayar (hutang)</div>
+          <div class="summary__value"><%= formatRupiah(summary.unpaid_total) %></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__title">Filter</div>
+      <form class="filters" method="get" action="/transactions">
+        <div class="field">
+          <label class="label">Cari nama</label>
+          <input class="input" name="q" value="<%= q %>" placeholder="Mis: Budi" />
+        </div>
+        <div class="field">
+          <label class="label">Status bayar</label>
+          <select class="select" name="status">
+            <option value="all" <%= status === 'all' ? 'selected' : '' %>>Semua</option>
+            <option value="paid" <%= status === 'paid' ? 'selected' : '' %>>Sudah dibayar</option>
+            <option value="unpaid" <%= status === 'unpaid' ? 'selected' : '' %>>Belum dibayar</option>
+          </select>
+        </div>
+        <div class="filters__actions">
+          <button class="btn" type="submit">Terapkan</button>
+          <a class="btn btn--ghost" href="/transactions">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card__title">Daftar Transaksi</div>
+    <div class="tablewrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tanggal</th>
+            <th>Pembeli</th>
+            <th>Qty</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Metode</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!rows.length) { %>
+            <tr>
+              <td colspan="8" class="muted">Belum ada transaksi.</td>
+            </tr>
+          <% } %>
+          <% rows.forEach((r) => { %>
+            <tr>
+              <td>#<%= r.id %></td>
+              <td class="nowrap"><%= r.created_at %></td>
+              <td><%= r.buyer_name %></td>
+              <td><%= r.total_qty %></td>
+              <td class="nowrap"><%= formatRupiah(r.total_amount) %></td>
+              <td>
+                <% if (r.is_paid) { %>
+                  <span class="badge badge--success">Lunas</span>
+                <% } else { %>
+                  <span class="badge badge--warning">Hutang</span>
+                <% } %>
+              </td>
+              <td><%= r.payment_method ? r.payment_method.toUpperCase() : '-' %></td>
+              <td class="nowrap">
+                <a class="btn btn--small" href="/transactions/<%= r.id %>">Detail</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<%- include('../partials/bottom') %>
+

@@ -1,0 +1,117 @@
+<%- include('../partials/top', { title, active: 'transactions' }) %>
+  <div class="pagehead">
+    <div>
+      <h1 class="h1">Tambah Transaksi</h1>
+      <div class="muted">Isi pembeli, barang, qty, dan status bayar</div>
+    </div>
+    <div class="pagehead__actions">
+      <a class="btn btn--ghost" href="/transactions">Kembali</a>
+    </div>
+  </div>
+
+  <% if (errors && errors.length) { %>
+    <div class="flash flash--error">
+      <div class="flash__title">Periksa input:</div>
+      <ul class="list">
+        <% errors.forEach((e) => { %>
+          <li><%= e %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+
+  <form class="card" method="post" action="/transactions">
+    <div class="card__title">Data Pembeli</div>
+
+    <div class="formgrid">
+      <div class="field">
+        <label class="label">Tanggal Transaksi</label>
+        <input class="input" name="transaction_date" type="date" value="<%= form.transaction_date || '' %>" required />
+      </div>
+      <div class="field">
+        <label class="label">Nama pembeli</label>
+        <input class="input" name="buyer_name" value="<%= form.buyer_name || '' %>" placeholder="Mis: Budi" required />
+      </div>
+      <div class="field">
+        <label class="label">Sudah dibayar?</label>
+        <select class="select" name="is_paid" id="isPaid">
+          <option value="0" <%= String(form.is_paid) === '0' ? 'selected' : '' %>>Belum (hutang)</option>
+          <option value="1" <%= String(form.is_paid) === '1' ? 'selected' : '' %>>Sudah dibayar</option>
+        </select>
+      </div>
+      <div class="field" id="paymentMethodWrap">
+        <label class="label">Metode pembayaran</label>
+        <select class="select" name="payment_method">
+          <option value="cash" <%= String(form.payment_method) === 'cash' ? 'selected' : '' %>>Tunai</option>
+          <option value="qris" <%= String(form.payment_method) === 'qris' ? 'selected' : '' %>>QRIS</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="card__title">Barang</div>
+    <div class="tablewrap">
+      <table class="table" id="itemsTable">
+        <thead>
+          <tr>
+            <th style="width: 40%;">Barang</th>
+            <th style="width: 20%;">Qty</th>
+            <th style="width: 15%;">Harga Satuan</th>
+            <th style="width: 15%;">Total</th>
+            <th style="width: 10%;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="itemRow">
+            <td>
+              <select class="select js-product-select" name="product_id" required>
+                <option value="" data-price="0">Pilih barang...</option>
+                <% products.forEach((p) => { %>
+                  <option value="<%= p.id %>" data-price="<%= p.price %>"><%= p.category_name %> — <%= p.name %></option>
+                <% }) %>
+              </select>
+            </td>
+            <td><input class="input js-qty-input" name="qty" type="number" min="1" step="1" value="1" required /></td>
+            <td class="nowrap js-unit-price">Rp 0</td>
+            <td class="nowrap js-row-total">Rp 0</td>
+            <td class="nowrap"><button class="btn btn--small btn--danger js-remove" type="button">Hapus</button></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" class="right">Grand Total:</th>
+            <th class="nowrap" id="grandTotal">Rp 0</th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="actions">
+      <button class="btn" type="button" id="addRow">Tambah baris</button>
+      <div class="spacer"></div>
+      <button class="btn btn--primary" type="submit">Simpan Transaksi</button>
+    </div>
+  </form>
+
+  <template id="rowTemplate">
+    <tr class="itemRow">
+      <td>
+        <select class="select js-product-select" name="product_id" required>
+          <option value="" data-price="0">Pilih barang...</option>
+          <% products.forEach((p) => { %>
+            <option value="<%= p.id %>" data-price="<%= p.price %>"><%= p.category_name %> — <%= p.name %></option>
+          <% }) %>
+        </select>
+      </td>
+      <td><input class="input js-qty-input" name="qty" type="number" min="1" step="1" value="1" required /></td>
+      <td class="nowrap js-unit-price">Rp 0</td>
+      <td class="nowrap js-row-total">Rp 0</td>
+      <td class="nowrap"><button class="btn btn--small btn--danger js-remove" type="button">Hapus</button></td>
+    </tr>
+  </template>
+
+  <script src="/static/transactions_new.js"></script>
+<%- include('../partials/bottom') %>
+

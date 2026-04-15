@@ -1,0 +1,107 @@
+<%- include('../partials/top', { title, active: 'transactions' }) %>
+  <div class="pagehead">
+    <div>
+      <h1 class="h1">Transaksi #<%= tx.id %></h1>
+      <div class="muted"><%= tx.created_at %></div>
+    </div>
+    <div class="pagehead__actions">
+      <a class="btn btn--ghost" href="/transactions">Kembali</a>
+    </div>
+  </div>
+
+  <%- include('../partials/flash', { msg, msgType }) %>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card__title">Ringkasan</div>
+      <div class="kv">
+        <div class="kv__row">
+          <div class="kv__k">Pembeli</div>
+          <div class="kv__v"><%= tx.buyer_name %></div>
+        </div>
+        <div class="kv__row">
+          <div class="kv__k">Total</div>
+          <div class="kv__v"><%= formatRupiah(tx.total_amount) %></div>
+        </div>
+        <div class="kv__row">
+          <div class="kv__k">Status</div>
+          <div class="kv__v">
+            <% if (tx.is_paid) { %>
+              <span class="badge badge--success">Lunas</span>
+            <% } else { %>
+              <span class="badge badge--warning">Hutang</span>
+            <% } %>
+          </div>
+        </div>
+        <div class="kv__row">
+          <div class="kv__k">Metode</div>
+          <div class="kv__v"><%= tx.payment_method ? tx.payment_method.toUpperCase() : '-' %></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__title">Pembayaran</div>
+      <form method="post" action="/transactions/<%= tx.id %>/payment?_method=PUT" class="formstack">
+        <div class="field">
+          <label class="label">Sudah dibayar?</label>
+          <select class="select" name="is_paid">
+            <option value="0" <%= String(tx.is_paid) === '0' ? 'selected' : '' %>>Belum (hutang)</option>
+            <option value="1" <%= String(tx.is_paid) === '1' ? 'selected' : '' %>>Sudah dibayar</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label">Metode pembayaran</label>
+          <select class="select" name="payment_method">
+            <option value="cash" <%= String(tx.payment_method) === 'cash' ? 'selected' : '' %>>Tunai</option>
+            <option value="qris" <%= String(tx.payment_method) === 'qris' ? 'selected' : '' %>>QRIS</option>
+          </select>
+        </div>
+        <div class="actions">
+          <button class="btn btn--primary" type="submit">Simpan</button>
+        </div>
+      </form>
+
+      <div class="divider"></div>
+
+      <form method="post" action="/transactions/<%= tx.id %>?_method=DELETE" onsubmit="return confirm('Hapus transaksi ini?');">
+        <button class="btn btn--danger" type="submit">Hapus Transaksi</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card__title">Barang</div>
+    <div class="tablewrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Barang</th>
+            <th>Kategori</th>
+            <th>Qty</th>
+            <th>Harga</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% items.forEach((it) => { %>
+            <tr>
+              <td><%= it.product_name %></td>
+              <td><%= it.category_name %></td>
+              <td><%= it.qty %></td>
+              <td class="nowrap"><%= formatRupiah(it.price) %></td>
+              <td class="nowrap"><%= formatRupiah(it.line_total) %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="4" class="right">Total</th>
+            <th class="nowrap"><%= formatRupiah(tx.total_amount) %></th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+<%- include('../partials/bottom') %>
+

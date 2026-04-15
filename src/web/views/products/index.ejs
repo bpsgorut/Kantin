@@ -1,0 +1,62 @@
+<%- include('../partials/top', { title, active: 'products' }) %>
+  <div class="pagehead">
+    <div>
+      <h1 class="h1">Produk</h1>
+      <div class="muted">Kelola daftar barang yang dijual di kantin</div>
+    </div>
+    <div class="pagehead__actions">
+      <a class="btn btn--primary" href="/products/new">Tambah Produk</a>
+    </div>
+  </div>
+
+  <%- include('../partials/flash', { msg, msgType }) %>
+
+  <div class="card">
+    <div class="card__title">Daftar Produk</div>
+    <div class="tablewrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Kategori</th>
+            <th>Harga</th>
+            <th>Stock Awal</th>
+            <th>Stock Saat Ini</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!products.length) { %>
+            <tr>
+              <td colspan="7" class="muted">Belum ada produk. Tambahkan dulu.</td>
+            </tr>
+          <% } %>
+          <% products.forEach((p) => { %>
+            <tr>
+              <td><%= p.name %></td>
+              <td><%= p.category_name %></td>
+              <td class="nowrap"><%= formatRupiah(p.price) %></td>
+              <td><%= p.initial_stock %></td>
+              <td><%= p.stock %></td>
+              <td>
+                <% if (p.stock > 0) { %>
+                  <span class="badge badge--success">Aktif</span>
+                <% } else { %>
+                  <span class="badge badge--muted">Habis</span>
+                <% } %>
+              </td>
+              <td class="nowrap">
+                <a class="btn btn--small" href="/products/<%= p.id %>/edit">Edit</a>
+                <form class="inline" method="post" action="/products/<%= p.id %>?_method=DELETE" onsubmit="return confirm('Hapus produk ini?');">
+                  <button class="btn btn--small btn--danger" type="submit">Hapus</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<%- include('../partials/bottom') %>
+

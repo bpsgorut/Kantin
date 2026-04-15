@@ -1,0 +1,57 @@
+<%- include('../partials/top', { title, active: 'products' }) %>
+  <div class="pagehead">
+    <div>
+      <h1 class="h1">Tambah Produk</h1>
+      <div class="muted">Nama, kategori, harga, stock, dan status aktif</div>
+    </div>
+    <div class="pagehead__actions">
+      <a class="btn btn--ghost" href="/products">Kembali</a>
+    </div>
+  </div>
+
+  <% if (errors && errors.length) { %>
+    <div class="flash flash--error">
+      <div class="flash__title">Periksa input:</div>
+      <ul class="list">
+        <% errors.forEach((e) => { %>
+          <li><%= e %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+
+  <form class="card formstack" method="post" action="/products">
+    <div class="field">
+      <label class="label">Nama produk</label>
+      <input class="input" name="name" value="<%= form.name || '' %>" placeholder="Mis: Teh Botol" required />
+    </div>
+    <div class="field">
+      <label class="label">Kategori</label>
+      <select class="select" name="category_id" required>
+        <option value="">Pilih kategori...</option>
+        <% categories.forEach((c) => { %>
+          <option value="<%= c.id %>" <%= String(form.category_id) === String(c.id) ? 'selected' : '' %>><%= c.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label">Harga (Rupiah)</label>
+      <input class="input" name="price" type="number" min="0" step="1" value="<%= typeof form.price !== 'undefined' ? form.price : 0 %>" required />
+    </div>
+    <div class="field">
+      <label class="label">Stock Awal</label>
+      <input class="input" name="initial_stock" type="number" min="0" step="1" value="<%= typeof form.initial_stock !== 'undefined' ? form.initial_stock : 0 %>" required />
+    </div>
+    <div class="field">
+      <label class="label">Aktif?</label>
+      <select class="select" name="is_active">
+        <option value="1" <%= String(form.is_active) !== '0' ? 'selected' : '' %>>Aktif</option>
+        <option value="0" <%= String(form.is_active) === '0' ? 'selected' : '' %>>Nonaktif</option>
+      </select>
+    </div>
+    <div class="actions">
+      <button class="btn btn--primary" type="submit">Simpan</button>
+    </div>
+  </form>
+<%- include('../partials/bottom') %>
+
