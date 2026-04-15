@@ -28,6 +28,13 @@ router.get("/", (req, res) => {
 
   const q = String(req.query.q || "").trim();
   const status = String(req.query.status || "all");
+  
+  // Default ke bulan & tahun saat ini
+  const now = new Date();
+  const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+  const currentYear = String(now.getFullYear());
+  
+  const month = req.query.month || `${currentYear}-${currentMonth}`;
 
   const where = [];
   const params = {};
@@ -41,6 +48,11 @@ router.get("/", (req, res) => {
   } else if (status === "unpaid") {
     where.push("t.is_paid = 0");
   }
+  
+  if (month) {
+    where.push("strftime('%Y-%m', t.created_at) = :month");
+    params.month = month;
+  }
 
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
 
@@ -53,7 +65,7 @@ router.get("/", (req, res) => {
         t.is_paid,
         t.payment_method,
         t.total_amount,
-        t.created_at,
+        DATE(t.created_at) AS created_date,
         (
           SELECT COALESCE(SUM(qty), 0)
           FROM transaction_items ti
@@ -61,7 +73,7 @@ router.get("/", (req, res) => {
         ) AS total_qty
       FROM transactions t
       ${whereSql}
-      ORDER BY t.id DESC
+      ORDER BY t.created_at DESC, t.id DESC
       LIMIT 500
       `
     )
@@ -73,16 +85,18 @@ router.get("/", (req, res) => {
       SELECT
         COALESCE(SUM(CASE WHEN is_paid = 1 THEN total_amount ELSE 0 END), 0) AS paid_total,
         COALESCE(SUM(CASE WHEN is_paid = 0 THEN total_amount ELSE 0 END), 0) AS unpaid_total
-      FROM transactions
+      FROM transactions t
+      ${whereSql}
       `
     )
-    .get();
+    .get(params);
 
   res.render("transactions/index", {
     title: "Transaksi",
     rows,
     q,
     status,
+    month,
     summary,
     msg: req.query.msg || null,
     msgType: req.query.type || "info"

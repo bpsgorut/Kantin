@@ -30,6 +30,10 @@
       <div class="card__title">Filter</div>
       <form class="filters" method="get" action="/transactions">
         <div class="field">
+          <label class="label">Bulan Transaksi</label>
+          <input class="input" type="month" name="month" value="<%= month %>" />
+        </div>
+        <div class="field">
           <label class="label">Cari nama</label>
           <input class="input" name="q" value="<%= q %>" placeholder="Mis: Budi" />
         </div>
@@ -42,7 +46,7 @@
           </select>
         </div>
         <div class="filters__actions">
-          <button class="btn" type="submit">Terapkan</button>
+          <button class="btn btn--primary" type="submit">Terapkan</button>
           <a class="btn btn--ghost" href="/transactions">Reset</a>
         </div>
       </form>
@@ -55,7 +59,6 @@
       <table class="table">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Tanggal</th>
             <th>Pembeli</th>
             <th>Qty</th>
@@ -68,13 +71,12 @@
         <tbody>
           <% if (!rows.length) { %>
             <tr>
-              <td colspan="8" class="muted">Belum ada transaksi.</td>
+              <td colspan="7" class="muted">Belum ada transaksi di bulan ini.</td>
             </tr>
           <% } %>
           <% rows.forEach((r) => { %>
             <tr>
-              <td>#<%= r.id %></td>
-              <td class="nowrap"><%= r.created_at %></td>
+              <td class="nowrap"><%= r.created_date %></td>
               <td><%= r.buyer_name %></td>
               <td><%= r.total_qty %></td>
               <td class="nowrap"><%= formatRupiah(r.total_amount) %></td>
