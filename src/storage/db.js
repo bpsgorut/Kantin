@@ -39,6 +39,60 @@ function getMonthRange(month) {
   return { start, end };
 }
 
+async function ensurePostgresSchema() {
+  const pool = getPgPool();
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS schema_migrations (
+      version TEXT PRIMARY KEY,
+      applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS categories (
+      id BIGSERIAL PRIMARY KEY,
+      name TEXT NOT NULL UNIQUE
+    );
+
+    CREATE TABLE IF NOT EXISTS products (
+      id BIGSERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      category_id BIGINT NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
+      price INTEGER NOT NULL DEFAULT 0,
+      initial_stock INTEGER NOT NULL DEFAULT 0,
+      stock INTEGER NOT NULL DEFAULT 0,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id);
+
+    CREATE TABLE IF NOT EXISTS transactions (
+      id BIGSERIAL PRIMARY KEY,
+      buyer_name TEXT NOT NULL,
+      is_paid INTEGER NOT NULL DEFAULT 0,
+      payment_method TEXT,
+      total_amount INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at);
+    CREATE INDEX IF NOT EXISTS idx_transactions_is_paid ON transactions(is_paid);
+
+    CREATE TABLE IF NOT EXISTS transaction_items (
+      id BIGSERIAL PRIMARY KEY,
+      transaction_id BIGINT NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+      product_id BIGINT NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
+      product_name TEXT NOT NULL,
+      category_name TEXT NOT NULL,
+      qty INTEGER NOT NULL,
+      price INTEGER NOT NULL,
+      line_total INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_transaction_items_transaction_id ON transaction_items(transaction_id);
+  `);
+}
+
 async function initDb() {
   if (isPostgres()) {
     if (!pgPool) {
@@ -49,6 +103,7 @@ async function initDb() {
       });
     }
     await pgPool.query("SELECT 1");
+    await ensurePostgresSchema();
     await seedDefaults();
     return;
   }
