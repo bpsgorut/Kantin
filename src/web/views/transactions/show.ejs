@@ -1,11 +1,11 @@
 <%- include('../partials/top', { title, active: 'transactions' }) %>
   <div class="pagehead">
     <div>
-      <h1 class="h1">Transaksi #<%= tx.id %></h1>
-      <div class="muted"><%= tx.created_at %></div>
-    </div>
-    <div class="pagehead__actions">
-      <a class="btn btn--ghost" href="/transactions">Kembali</a>
+      <div class="pagehead__titleline">
+        <h1 class="h1">Transaksi #<%= tx.id %></h1>
+        <a class="btn btn--ghost btn--small pagehead__back" href="/transactions">Kembali</a>
+      </div>
+      <div class="muted"><%= tx.created_date %></div>
     </div>
   </div>
 
@@ -72,8 +72,8 @@
 
   <div class="card">
     <div class="card__title">Barang</div>
-    <div class="tablewrap">
-      <table class="table">
+    <div class="tablewrap tablewrap--stack">
+      <table class="table table--stack">
         <thead>
           <tr>
             <th>Barang</th>
@@ -86,11 +86,11 @@
         <tbody>
           <% items.forEach((it) => { %>
             <tr>
-              <td><%= it.product_name %></td>
-              <td><%= it.category_name %></td>
-              <td><%= it.qty %></td>
-              <td class="nowrap"><%= formatRupiah(it.price) %></td>
-              <td class="nowrap"><%= formatRupiah(it.line_total) %></td>
+              <td data-label="Barang"><%= it.product_name %></td>
+              <td data-label="Kategori"><%= it.category_name %></td>
+              <td data-label="Qty"><%= it.qty %></td>
+              <td class="nowrap" data-label="Harga"><%= formatRupiah(it.price) %></td>
+              <td class="nowrap" data-label="Subtotal"><%= formatRupiah(it.line_total) %></td>
             </tr>
           <% }) %>
         </tbody>
@@ -104,4 +104,3 @@
     </div>
   </div>
 <%- include('../partials/bottom') %>
-

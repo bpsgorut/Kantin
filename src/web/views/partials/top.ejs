@@ -14,7 +14,13 @@
     <header class="header">
       <div class="container header__inner">
         <div class="brand">
-          <a href="/transactions" class="brand__link">Kantin <span style="color: var(--text)">Ke-</span>JYUJYUR<span style="color: var(--text)">-an</span></a>
+          <a href="/transactions" class="brand__link">
+            <span class="brand__mark" aria-hidden="true">K</span>
+            <span class="brand__text">
+              <span class="brand__kantin">Kantin</span>
+              <span class="brand__ke">Ke-</span>JYUJYUR<span class="brand__an">-an</span>
+            </span>
+          </a>
         </div>
         <nav class="nav">
           <a class="nav__link <%= active === 'transactions' ? 'is-active' : '' %>" href="/transactions">Transaksi</a>

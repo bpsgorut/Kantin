@@ -15,12 +15,12 @@
     <div class="card">
       <div class="card__title">Ringkasan</div>
       <div class="summary">
-        <div>
+        <div class="summary__item">
           <div class="muted">Sudah dibayar</div>
           <div class="summary__value"><%= formatRupiah(summary.paid_total) %></div>
         </div>
-        <div>
-          <div class="muted">Belum dibayar (hutang)</div>
+        <div class="summary__item">
+          <div class="muted">Belum dibayar</div>
           <div class="summary__value"><%= formatRupiah(summary.unpaid_total) %></div>
         </div>
       </div>
@@ -28,11 +28,7 @@
 
     <div class="card">
       <div class="card__title">Filter</div>
-      <form class="filters" method="get" action="/transactions">
-        <div class="field">
-          <label class="label">Bulan Transaksi</label>
-          <input class="input" type="month" name="month" value="<%= month %>" />
-        </div>
+      <form class="filters tx-filters" method="get" action="/transactions">
         <div class="field">
           <label class="label">Cari nama</label>
           <input class="input" name="q" value="<%= q %>" placeholder="Mis: Budi" />
@@ -55,8 +51,15 @@
 
   <div class="card">
     <div class="card__title">Daftar Transaksi</div>
-    <div class="tablewrap">
-      <table class="table">
+    <div class="tx-monthbar">
+      <div class="tx-monthbar__right">
+        <a class="btn btn--icon" aria-label="Bulan sebelumnya" href="<%= prevUrl %>">‹</a>
+        <div class="tx-monthbar__label"><%= monthLabel %></div>
+        <a class="btn btn--icon" aria-label="Bulan berikutnya" href="<%= nextUrl %>">›</a>
+      </div>
+    </div>
+    <div class="tablewrap tx-tablewrap">
+      <table class="table tx-table">
         <thead>
           <tr>
             <th>Tanggal</th>
@@ -76,19 +79,19 @@
           <% } %>
           <% rows.forEach((r) => { %>
             <tr>
-              <td class="nowrap"><%= r.created_date %></td>
-              <td><%= r.buyer_name %></td>
-              <td><%= r.total_qty %></td>
-              <td class="nowrap"><%= formatRupiah(r.total_amount) %></td>
-              <td>
+              <td class="nowrap" data-label="Tanggal"><%= r.created_date %></td>
+              <td data-label="Pembeli"><%= r.buyer_name %></td>
+              <td data-label="Qty"><%= r.total_qty %></td>
+              <td class="nowrap" data-label="Total"><%= formatRupiah(r.total_amount) %></td>
+              <td data-label="Status">
                 <% if (r.is_paid) { %>
                   <span class="badge badge--success">Lunas</span>
                 <% } else { %>
                   <span class="badge badge--warning">Hutang</span>
                 <% } %>
               </td>
-              <td><%= r.payment_method ? r.payment_method.toUpperCase() : '-' %></td>
-              <td class="nowrap">
+              <td data-label="Metode"><%= r.payment_method ? r.payment_method.toUpperCase() : '-' %></td>
+              <td class="nowrap" data-label="">
                 <a class="btn btn--small" href="/transactions/<%= r.id %>">Detail</a>
               </td>
             </tr>
@@ -98,4 +101,3 @@
     </div>
   </div>
 <%- include('../partials/bottom') %>
-

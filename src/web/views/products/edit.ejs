@@ -1,11 +1,11 @@
 <%- include('../partials/top', { title, active: 'products' }) %>
   <div class="pagehead">
     <div>
-      <h1 class="h1">Edit Produk</h1>
+      <div class="pagehead__titleline">
+        <h1 class="h1">Edit Produk</h1>
+        <a class="btn btn--ghost btn--small pagehead__back" href="/products">Kembali</a>
+      </div>
       <div class="muted">Perbarui data produk</div>
-    </div>
-    <div class="pagehead__actions">
-      <a class="btn btn--ghost" href="/products">Kembali</a>
     </div>
   </div>
 
@@ -57,4 +57,3 @@
     </div>
   </form>
 <%- include('../partials/bottom') %>
-

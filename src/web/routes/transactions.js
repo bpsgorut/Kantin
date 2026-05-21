@@ -4,6 +4,35 @@ const { toInt, toBoolInt } = require("../lib/format");
 
 const router = express.Router();
 
+function shiftMonth(month, delta) {
+  const [yRaw, mRaw] = String(month || "").split("-");
+  const y = Number(yRaw);
+  const m = Number(mRaw);
+  if (!y || !m) return month;
+  const d = new Date(Date.UTC(y, m - 1 + delta, 1));
+  const yy = String(d.getUTCFullYear());
+  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+  return `${yy}-${mm}`;
+}
+
+function formatMonthLabel(month) {
+  const [yRaw, mRaw] = String(month || "").split("-");
+  const y = Number(yRaw);
+  const m = Number(mRaw);
+  if (!y || !m) return String(month || "");
+  const d = new Date(Date.UTC(y, m - 1, 1));
+  return new Intl.DateTimeFormat("id-ID", { month: "long", year: "numeric" }).format(d);
+}
+
+function buildTransactionsUrl({ month, q, status }) {
+  const sp = new URLSearchParams();
+  if (month) sp.set("month", month);
+  if (q) sp.set("q", q);
+  if (status) sp.set("status", status);
+  const qs = sp.toString();
+  return qs ? `/transactions?${qs}` : "/transactions";
+}
+
 function getActiveProducts(db) {
   return db
     .prepare(
@@ -35,6 +64,11 @@ router.get("/", (req, res) => {
   const currentYear = String(now.getFullYear());
   
   const month = req.query.month || `${currentYear}-${currentMonth}`;
+  const monthLabel = formatMonthLabel(month);
+  const prevMonth = shiftMonth(month, -1);
+  const nextMonth = shiftMonth(month, 1);
+  const prevUrl = buildTransactionsUrl({ month: prevMonth, q, status });
+  const nextUrl = buildTransactionsUrl({ month: nextMonth, q, status });
 
   const where = [];
   const params = {};
@@ -97,6 +131,9 @@ router.get("/", (req, res) => {
     q,
     status,
     month,
+    monthLabel,
+    prevUrl,
+    nextUrl,
     summary,
     msg: req.query.msg || null,
     msgType: req.query.type || "info"
@@ -156,7 +193,7 @@ router.post("/", (req, res) => {
     });
   }
 
-  const createDateTime = transactionDate ? `${transactionDate} ${new Date().toTimeString().slice(0, 8)}` : null;
+  const createDate = transactionDate || null;
 
   const createTx = db.transaction(() => {
     const insertTx = db
@@ -167,7 +204,7 @@ router.post("/", (req, res) => {
         `
       );
 
-    const txInfo = insertTx.run(buyerName, isPaid, isPaid ? paymentMethod : null, createDateTime);
+    const txInfo = insertTx.run(buyerName, isPaid, isPaid ? paymentMethod : null, createDate);
     const transactionId = txInfo.lastInsertRowid;
 
     const getProduct = db.prepare(
@@ -238,7 +275,7 @@ router.get("/:id", (req, res) => {
   const tx = db
     .prepare(
       `
-      SELECT id, buyer_name, is_paid, payment_method, total_amount, created_at
+      SELECT id, buyer_name, is_paid, payment_method, total_amount, DATE(created_at) AS created_date
       FROM transactions
       WHERE id = ?
       `

@@ -151,6 +151,32 @@ router.put("/:id", (req, res) => {
   res.redirect("/products?msg=Produk%20diupdate&type=success");
 });
 
+router.put("/:id/refill", (req, res) => {
+  const db = getDb();
+  const id = toInt(req.params.id, 0);
+  const qty = toInt(req.body.qty, 0);
+
+  if (!id) return res.redirect("/products?msg=ID%20tidak%20valid&type=error");
+  if (!Number.isFinite(qty) || qty <= 0) return res.redirect("/products?msg=Jumlah%20refill%20tidak%20valid&type=error");
+
+  const productExists = db.prepare("SELECT 1 FROM products WHERE id = ?").get(id);
+  if (!productExists) return res.redirect("/products?msg=Produk%20tidak%20ditemukan&type=error");
+
+  db.prepare(
+    `
+    UPDATE products
+    SET
+      stock = stock + ?,
+      initial_stock = initial_stock + ?,
+      is_active = 1,
+      updated_at = datetime('now')
+    WHERE id = ?
+    `
+  ).run(qty, qty, id);
+
+  res.redirect("/products?msg=Stock%20berhasil%20direfill&type=success");
+});
+
 router.delete("/:id", (req, res) => {
   const db = getDb();
   const id = toInt(req.params.id, 0);
@@ -165,4 +191,3 @@ router.delete("/:id", (req, res) => {
 });
 
 module.exports = router;
-

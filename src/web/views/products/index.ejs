@@ -13,8 +13,8 @@
 
   <div class="card">
     <div class="card__title">Daftar Produk</div>
-    <div class="tablewrap">
-      <table class="table">
+    <div class="tablewrap tablewrap--stack">
+      <table class="table table--stack">
         <thead>
           <tr>
             <th>Nama</th>
@@ -34,19 +34,23 @@
           <% } %>
           <% products.forEach((p) => { %>
             <tr>
-              <td><%= p.name %></td>
-              <td><%= p.category_name %></td>
-              <td class="nowrap"><%= formatRupiah(p.price) %></td>
-              <td><%= p.initial_stock %></td>
-              <td><%= p.stock %></td>
-              <td>
+              <td data-label="Nama"><%= p.name %></td>
+              <td data-label="Kategori"><%= p.category_name %></td>
+              <td class="nowrap" data-label="Harga"><%= formatRupiah(p.price) %></td>
+              <td data-label="Stock Awal"><%= p.initial_stock %></td>
+              <td data-label="Stock Saat Ini"><%= p.stock %></td>
+              <td data-label="Status">
                 <% if (p.stock > 0) { %>
                   <span class="badge badge--success">Aktif</span>
                 <% } else { %>
                   <span class="badge badge--muted">Habis</span>
                 <% } %>
               </td>
-              <td class="nowrap">
+              <td class="nowrap" data-label="">
+                <form class="inline js-refill-form" method="post" action="/products/<%= p.id %>/refill?_method=PUT">
+                  <input type="hidden" name="qty" value="" />
+                  <button class="btn btn--small js-refill-btn" type="button" data-product-name="<%= p.name %>">Refill</button>
+                </form>
                 <a class="btn btn--small" href="/products/<%= p.id %>/edit">Edit</a>
                 <form class="inline" method="post" action="/products/<%= p.id %>?_method=DELETE" onsubmit="return confirm('Hapus produk ini?');">
                   <button class="btn btn--small btn--danger" type="submit">Hapus</button>
@@ -58,5 +62,24 @@
       </table>
     </div>
   </div>
+  <script>
+    (() => {
+      const buttons = document.querySelectorAll(".js-refill-btn");
+      for (const btn of buttons) {
+        btn.addEventListener("click", () => {
+          const form = btn.closest(".js-refill-form");
+          if (!form) return;
+          const productName = btn.getAttribute("data-product-name") || "produk ini";
+          const raw = window.prompt(`Refill stock untuk ${productName}\nMasukkan jumlah stock yang ditambahkan:`, "1");
+          if (raw === null) return;
+          const qty = Number.parseInt(String(raw).trim(), 10);
+          if (!Number.isFinite(qty) || qty <= 0) return;
+          const input = form.querySelector('input[name="qty"]');
+          if (!input) return;
+          input.value = String(qty);
+          form.submit();
+        });
+      }
+    })();
+  </script>
 <%- include('../partials/bottom') %>
-
