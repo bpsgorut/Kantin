@@ -51,8 +51,8 @@
     <div class="divider"></div>
 
     <div class="card__title">Barang</div>
-    <div class="tablewrap">
-      <table class="table" id="itemsTable">
+    <div class="tablewrap tablewrap--stack">
+      <table class="table table--stack" id="itemsTable">
         <thead>
           <tr>
             <th style="width: 40%;">Barang</th>
@@ -64,7 +64,7 @@
         </thead>
         <tbody>
           <tr class="itemRow">
-            <td>
+            <td data-label="Barang">
               <select class="select js-product-select" name="product_id" required>
                 <option value="" data-price="0">Pilih barang...</option>
                 <% products.forEach((p) => { %>
@@ -72,10 +72,14 @@
                 <% }) %>
               </select>
             </td>
-            <td><input class="input js-qty-input" name="qty" type="number" min="1" step="1" value="1" required /></td>
-            <td class="nowrap js-unit-price">Rp 0</td>
-            <td class="nowrap js-row-total">Rp 0</td>
-            <td class="nowrap"><button class="btn btn--small btn--danger js-remove" type="button">Hapus</button></td>
+            <td data-label="Qty">
+              <input class="input js-qty-input" name="qty" type="number" min="1" step="1" value="1" required />
+            </td>
+            <td class="nowrap js-unit-price" data-label="Harga">Rp 0</td>
+            <td class="nowrap js-row-total" data-label="Total">Rp 0</td>
+            <td class="nowrap" data-label="">
+              <button class="btn btn--small btn--danger js-remove" type="button">Hapus</button>
+            </td>
           </tr>
         </tbody>
         <tfoot>
@@ -97,7 +101,7 @@
 
   <template id="rowTemplate">
     <tr class="itemRow">
-      <td>
+      <td data-label="Barang">
         <select class="select js-product-select" name="product_id" required>
           <option value="" data-price="0">Pilih barang...</option>
           <% products.forEach((p) => { %>
@@ -105,10 +109,14 @@
           <% }) %>
         </select>
       </td>
-      <td><input class="input js-qty-input" name="qty" type="number" min="1" step="1" value="1" required /></td>
-      <td class="nowrap js-unit-price">Rp 0</td>
-      <td class="nowrap js-row-total">Rp 0</td>
-      <td class="nowrap"><button class="btn btn--small btn--danger js-remove" type="button">Hapus</button></td>
+      <td data-label="Qty">
+        <input class="input js-qty-input" name="qty" type="number" min="1" step="1" value="1" required />
+      </td>
+      <td class="nowrap js-unit-price" data-label="Harga">Rp 0</td>
+      <td class="nowrap js-row-total" data-label="Total">Rp 0</td>
+      <td class="nowrap" data-label="">
+        <button class="btn btn--small btn--danger js-remove" type="button">Hapus</button>
+      </td>
     </tr>
   </template>
 
