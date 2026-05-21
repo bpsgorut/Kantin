@@ -9,37 +9,42 @@ const { formatRupiah } = require("./web/lib/format");
 const transactionsRouter = require("./web/routes/transactions");
 const productsRouter = require("./web/routes/products");
 
-initDb();
+(async () => {
+  await initDb();
 
-const app = express();
-const PORT = Number(process.env.PORT || 3000);
+  const app = express();
+  const PORT = Number(process.env.PORT || 3000);
 
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "web", "views"));
+  app.set("view engine", "ejs");
+  app.set("views", path.join(__dirname, "web", "views"));
 
-app.locals.formatRupiah = formatRupiah;
+  app.locals.formatRupiah = formatRupiah;
 
-const logFormat = process.env.NODE_ENV === "production" ? "combined" : "dev";
-app.use(morgan(logFormat));
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-app.use(methodOverride("_method"));
-app.use("/static", express.static(path.join(__dirname, "web", "static")));
+  const logFormat = process.env.NODE_ENV === "production" ? "combined" : "dev";
+  app.use(morgan(logFormat));
+  app.use(express.urlencoded({ extended: false }));
+  app.use(express.json());
+  app.use(methodOverride("_method"));
+  app.use("/static", express.static(path.join(__dirname, "web", "static")));
 
-app.get("/", (req, res) => res.redirect("/transactions"));
+  app.get("/", (req, res) => res.redirect("/transactions"));
 
-app.use("/transactions", transactionsRouter);
-app.use("/products", productsRouter);
+  app.use("/transactions", transactionsRouter);
+  app.use("/products", productsRouter);
 
-app.use((req, res) => {
-  res.status(404).render("404", { title: "Tidak ditemukan" });
-});
+  app.use((req, res) => {
+    res.status(404).render("404", { title: "Tidak ditemukan" });
+  });
 
-app.use((err, req, res, next) => {
+  app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(500).render("500", { title: "Terjadi kesalahan", message: err?.message });
+  });
+
+  app.listen(PORT, () => {
+    console.log(`Kantin berjalan di http://localhost:${PORT}`);
+  });
+})().catch(err => {
   console.error(err);
-  res.status(500).render("500", { title: "Terjadi kesalahan", message: err?.message });
-});
-
-app.listen(PORT, () => {
-  console.log(`Kantin berjalan di http://localhost:${PORT}`);
+  process.exit(1);
 });
