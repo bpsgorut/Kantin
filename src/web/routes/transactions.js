@@ -178,7 +178,7 @@ router.get("/:id", async (req, res, next) => {
     const items = await listTransactionItems(id);
 
     res.render("transactions/show", {
-      title: `Transaksi #${tx.id}`,
+      title: "Detail Transaksi",
       tx,
       items,
       msg: req.query.msg || null,

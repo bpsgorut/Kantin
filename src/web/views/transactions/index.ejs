@@ -79,7 +79,7 @@
           <% } %>
           <% rows.forEach((r) => { %>
             <tr>
-              <td class="nowrap" data-label="Tanggal"><%= r.created_date %></td>
+              <td class="nowrap" data-label="Tanggal"><%= formatTanggal(r.created_date) %></td>
               <td data-label="Pembeli"><%= r.buyer_name %></td>
               <td data-label="Qty"><%= r.total_qty %></td>
               <td class="nowrap" data-label="Total"><%= formatRupiah(r.total_amount) %></td>

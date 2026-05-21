@@ -337,6 +337,17 @@ a {
   border-color: transparent;
 }
 
+.btn--back {
+  background: rgba(79, 140, 255, 0.12);
+  border-color: rgba(79, 140, 255, 0.28);
+  color: #2457c5;
+}
+
+.btn--back:hover {
+  background: rgba(79, 140, 255, 0.18);
+  box-shadow: 0 4px 15px rgba(79, 140, 255, 0.22);
+}
+
 .btn--danger {
   background: rgba(255, 77, 77, 0.08);
   border-color: rgba(255, 77, 77, 0.2);
@@ -1125,6 +1136,18 @@ body {
 
 .btn--ghost:hover {
   background: rgba(15, 23, 42, 0.04);
+}
+
+.btn--back {
+  background: rgba(79, 140, 255, 0.12);
+  border-color: rgba(79, 140, 255, 0.28);
+  color: #2457c5;
+  box-shadow: none;
+}
+
+.btn--back:hover {
+  background: rgba(79, 140, 255, 0.18);
+  box-shadow: 0 14px 40px rgba(79, 140, 255, 0.20);
 }
 
 .btn--danger {

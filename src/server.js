@@ -5,7 +5,7 @@ const methodOverride = require("method-override");
 const morgan = require("morgan");
 
 const { initDb } = require("./storage/db");
-const { formatRupiah } = require("./web/lib/format");
+const { formatRupiah, formatTanggal } = require("./web/lib/format");
 const transactionsRouter = require("./web/routes/transactions");
 const productsRouter = require("./web/routes/products");
 
@@ -19,6 +19,7 @@ const productsRouter = require("./web/routes/products");
   app.set("views", path.join(__dirname, "web", "views"));
 
   app.locals.formatRupiah = formatRupiah;
+  app.locals.formatTanggal = formatTanggal;
 
   const logFormat = process.env.NODE_ENV === "production" ? "combined" : "dev";
   app.use(morgan(logFormat));
