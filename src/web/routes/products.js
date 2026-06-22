@@ -8,6 +8,7 @@ const {
   productExists,
   updateProduct,
   refillProduct,
+  resetProduct,
   deleteProduct
 } = require("../../storage/db");
 const { toInt } = require("../lib/format");
@@ -151,6 +152,23 @@ router.put("/:id/refill", async (req, res, next) => {
     await refillProduct({ id, qty });
 
     res.redirect("/products?msg=Stock%20berhasil%20direfill&type=success");
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.put("/:id/reset", async (req, res, next) => {
+  try {
+    const id = toInt(req.params.id, 0);
+
+    if (!id) return res.redirect("/products?msg=ID%20tidak%20valid&type=error");
+
+    const productOk = await productExists(id);
+    if (!productOk) return res.redirect("/products?msg=Produk%20tidak%20ditemukan&type=error");
+
+    await resetProduct(id);
+
+    res.redirect("/products?msg=Data%20produk%20berhasil%20direset&type=success");
   } catch (e) {
     next(e);
   }

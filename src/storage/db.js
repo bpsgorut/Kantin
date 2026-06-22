@@ -336,6 +336,28 @@ async function refillProduct({ id, qty }) {
   ).run(qty, qty, id);
 }
 
+async function resetProduct(id) {
+  if (isPostgres()) {
+    await getPgPool().query(
+      `
+      UPDATE products
+      SET initial_stock = 0, stock = 0, is_active = 0, updated_at = NOW()
+      WHERE id = $1
+      `,
+      [id]
+    );
+    return;
+  }
+  const db = getSqliteDb();
+  db.prepare(
+    `
+    UPDATE products
+    SET initial_stock = 0, stock = 0, is_active = 0, updated_at = datetime('now')
+    WHERE id = ?
+    `
+  ).run(id);
+}
+
 async function deleteProduct(id) {
   if (isPostgres()) {
     await getPgPool().query("DELETE FROM products WHERE id = $1", [id]);
@@ -723,6 +745,7 @@ module.exports = {
   productExists,
   updateProduct,
   refillProduct,
+  resetProduct,
   deleteProduct,
   listActiveProducts,
   listTransactions,
